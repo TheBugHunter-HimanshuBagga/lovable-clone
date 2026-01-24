@@ -16,7 +16,8 @@ public interface ProjectMapper {
     @Mapping(source = "name", target = "projectName")
         //    @Mapping(target = "createdAt" , dateFormat = "YYYY-MM-DD")
     ProjectSummaryResponse toProjectSummaryResponse(Project project); // entity to dto
-//    List<ProjectSummaryResponse> toListOfProjectSummaryResponse(List<Project> project);
+
+    List<ProjectSummaryResponse> toListOfProjectSummaryResponse(List<Project> project);
 
 
 

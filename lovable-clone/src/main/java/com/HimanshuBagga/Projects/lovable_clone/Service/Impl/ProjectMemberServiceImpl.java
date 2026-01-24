@@ -8,6 +8,7 @@ import com.HimanshuBagga.Projects.lovable_clone.Entity.ProjectMember;
 import com.HimanshuBagga.Projects.lovable_clone.Entity.ProjectMemberId;
 import com.HimanshuBagga.Projects.lovable_clone.Entity.User;
 import com.HimanshuBagga.Projects.lovable_clone.Service.ProjectMemberService;
+import com.HimanshuBagga.Projects.lovable_clone.error.ResourceNotFoundException;
 import com.HimanshuBagga.Projects.lovable_clone.mapper.ProjectMemberMapper;
 import com.HimanshuBagga.Projects.lovable_clone.repository.ProjectMemberRepository;
 import com.HimanshuBagga.Projects.lovable_clone.repository.ProjectRepository;
@@ -31,29 +32,28 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     UserRepository userRepository;
     @Override
     public List<MemberResponse> getProjectMembers(Long projectId, Long userId) {
-        Project project = projectRepository.findAccessibleProjectsById(projectId , userId).orElseThrow(); // i got the project
-        List<MemberResponse> memberResponseList = new ArrayList<>(); // {} as much as it can
-        memberResponseList.add(projectMemberMapper.toProjectMemberResponseFromOwner(project.getOwner())); // owner is type user till now owner is my member now adding other members
-        memberResponseList.addAll(
-                projectMemberRepository.findByIdProjectId(projectId)
-                        .stream()
-                        .map(projectMemberMapper::toProjectMemberInvited) // User → MemberResponse
-                        .toList()
-        );
 
+        Project project = projectRepository.findAccessibleProjectsById(projectId , userId).orElseThrow(
+                () -> new ResourceNotFoundException("Project not found with id : " , projectId)
+        ); // i got the project
 
-        return memberResponseList;
+        return projectMemberRepository.findByIdProjectId(projectId)
+                .stream()
+                .map(projectMemberMapper::toProjectMemberResponseFromMember)
+                .toList();
     }
 
     @Override
     public MemberResponse inviteMember(Long projectId, Long userId, InviteMemberRequest request) {
-        Project project = projectRepository.findAccessibleProjectsById(projectId , userId).orElseThrow();
+        Project project = projectRepository.findAccessibleProjectsById(projectId , userId).orElseThrow(
+                () -> new ResourceNotFoundException("Project not found with id : " , projectId)
+        );
 
-        if(!project.getOwner().getId().equals(userId)){
-            throw new RuntimeException("You are not allowed");
-        }
+//        if(!project.getOwner().getId().equals(userId)){
+//            throw new RuntimeException("You are not allowed");
+//        }
 
-        User invitee = userRepository.findByEmail(request.email()).orElseThrow();
+        User invitee = userRepository.findByUsername(request.username()).orElseThrow();
 
         if(invitee.getId().equals(userId)){
             throw new RuntimeException("Cannot Invite Person");
@@ -79,9 +79,9 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     @Override
     public MemberResponse updateMemberRole(Long projectId, Long userId, Long memberId, updateMemberRole request) {
         Project project = projectRepository.findAccessibleProjectsById(projectId,userId).orElseThrow();
-        if(!project.getOwner().getId().equals(userId)){
-            throw new RuntimeException("Not Allowed");
-        }
+//        if(!project.getOwner().getId().equals(userId)){
+//            throw new RuntimeException("Not Allowed");
+//        }
         ProjectMemberId projectMemberId = new ProjectMemberId(projectId , memberId);
         ProjectMember projectMember = projectMemberRepository.findById(projectMemberId).orElseThrow();
         projectMember.setRole(request.role());
@@ -92,9 +92,9 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     @Override
     public void deleteMember(Long projectId, Long userId, Long memberId) {
         Project project = projectRepository.findAccessibleProjectsById(projectId , userId).orElseThrow();
-        if(!project.getOwner().getId().equals(userId)){
-            throw new RuntimeException("Not Allowed");
-        }
+//        if(!project.getOwner().getId().equals(userId)){
+//            throw new RuntimeException("Not Allowed");
+//        }
         ProjectMemberId projectMemberId = new ProjectMemberId(projectId , memberId);
         if(!projectMemberRepository.existsById(projectMemberId)){
             throw new RuntimeException("Not Found");

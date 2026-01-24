@@ -19,12 +19,15 @@ public class ProjectMember {
     @EmbeddedId // we need to pass 2 param , from this we can define composite id
             // composite key means primary key is made up of more than one column
     ProjectMemberId id;
+
     @ManyToOne
     @MapsId("projectId") // It maps to a field inside the embeddedId
     Project project;
+
     @ManyToOne
     @MapsId("UserId") // join table + additional fields
     User user;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     ProjectRole role;

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-01-24T15:23:45+0530",
+    date = "2026-01-25T01:58:08+0530",
     comments = "version: 1.6.0, compiler: javac, environment: Java 25.0.1 (Oracle Corporation)"
 )
 @Component
@@ -24,42 +24,42 @@ public class ProjectMemberMapperImpl implements ProjectMemberMapper {
 
         Long userId = null;
         String name = null;
-        String email = null;
-        String avatarUrl = null;
+        String username = null;
 
         userId = owner.getId();
         name = owner.getName();
-        email = owner.getEmail();
-        avatarUrl = owner.getAvatarUrl();
+        username = owner.getUsername();
 
         ProjectRole role = ProjectRole.OWNER;
         Instant invitedAt = null;
+        String avatarUrl = null;
 
-        MemberResponse memberResponse = new MemberResponse( userId, name, email, avatarUrl, role, invitedAt );
+        MemberResponse memberResponse = new MemberResponse( userId, name, username, avatarUrl, role, invitedAt );
 
         return memberResponse;
     }
 
     @Override
-    public MemberResponse toProjectMemberResponseFromMember(User user) {
-        if ( user == null ) {
+    public MemberResponse toProjectMemberResponseFromMember(ProjectMember projectMember) {
+        if ( projectMember == null ) {
             return null;
         }
 
         Long userId = null;
         String name = null;
-        String email = null;
-        String avatarUrl = null;
-
-        userId = user.getId();
-        name = user.getName();
-        email = user.getEmail();
-        avatarUrl = user.getAvatarUrl();
-
+        String username = null;
         ProjectRole role = null;
         Instant invitedAt = null;
 
-        MemberResponse memberResponse = new MemberResponse( userId, name, email, avatarUrl, role, invitedAt );
+        userId = projectMemberUserId( projectMember );
+        name = projectMemberUserName( projectMember );
+        username = projectMemberUserUsername( projectMember );
+        role = projectMember.getRole();
+        invitedAt = projectMember.getInvitedAt();
+
+        String avatarUrl = null;
+
+        MemberResponse memberResponse = new MemberResponse( userId, name, username, avatarUrl, role, invitedAt );
 
         return memberResponse;
     }
@@ -72,24 +72,24 @@ public class ProjectMemberMapperImpl implements ProjectMemberMapper {
 
         Long userId = null;
         String name = null;
-        String email = null;
-        String avatarUrl = null;
+        String username = null;
         ProjectRole role = null;
         Instant invitedAt = null;
 
-        userId = memberUserId( member );
-        name = memberUserName( member );
-        email = memberUserEmail( member );
-        avatarUrl = memberUserAvatarUrl( member );
+        userId = projectMemberUserId( member );
+        name = projectMemberUserName( member );
+        username = projectMemberUserUsername( member );
         role = member.getRole();
         invitedAt = member.getInvitedAt();
 
-        MemberResponse memberResponse = new MemberResponse( userId, name, email, avatarUrl, role, invitedAt );
+        String avatarUrl = null;
+
+        MemberResponse memberResponse = new MemberResponse( userId, name, username, avatarUrl, role, invitedAt );
 
         return memberResponse;
     }
 
-    private Long memberUserId(ProjectMember projectMember) {
+    private Long projectMemberUserId(ProjectMember projectMember) {
         User user = projectMember.getUser();
         if ( user == null ) {
             return null;
@@ -97,7 +97,7 @@ public class ProjectMemberMapperImpl implements ProjectMemberMapper {
         return user.getId();
     }
 
-    private String memberUserName(ProjectMember projectMember) {
+    private String projectMemberUserName(ProjectMember projectMember) {
         User user = projectMember.getUser();
         if ( user == null ) {
             return null;
@@ -105,19 +105,11 @@ public class ProjectMemberMapperImpl implements ProjectMemberMapper {
         return user.getName();
     }
 
-    private String memberUserEmail(ProjectMember projectMember) {
+    private String projectMemberUserUsername(ProjectMember projectMember) {
         User user = projectMember.getUser();
         if ( user == null ) {
             return null;
         }
-        return user.getEmail();
-    }
-
-    private String memberUserAvatarUrl(ProjectMember projectMember) {
-        User user = projectMember.getUser();
-        if ( user == null ) {
-            return null;
-        }
-        return user.getAvatarUrl();
+        return user.getUsername();
     }
 }
