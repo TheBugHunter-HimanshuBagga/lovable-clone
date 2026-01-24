@@ -20,15 +20,21 @@ public class Project {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
+
     @Column(nullable = false)
     String name;
+
     @ManyToOne
     @JoinColumn(name = "owner_id", nullable = false)
     User owner;
+
     Boolean isPublic = false;
+
     @CreationTimestamp
     Instant createdAt;
+
     Instant deletedAt;
+
     @UpdateTimestamp
     Instant updatedAt;
 }

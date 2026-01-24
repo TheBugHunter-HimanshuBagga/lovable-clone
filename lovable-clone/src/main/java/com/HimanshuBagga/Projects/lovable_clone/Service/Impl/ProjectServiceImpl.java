@@ -6,6 +6,7 @@ import com.HimanshuBagga.Projects.lovable_clone.DTO.project.ProjectSummaryRespon
 import com.HimanshuBagga.Projects.lovable_clone.Entity.Project;
 import com.HimanshuBagga.Projects.lovable_clone.Entity.User;
 import com.HimanshuBagga.Projects.lovable_clone.Service.ProjectService;
+import com.HimanshuBagga.Projects.lovable_clone.error.ResourceNotFoundException;
 import com.HimanshuBagga.Projects.lovable_clone.mapper.ProjectMapper;
 import com.HimanshuBagga.Projects.lovable_clone.repository.ProjectRepository;
 import com.HimanshuBagga.Projects.lovable_clone.repository.UserRepository;
@@ -39,14 +40,19 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public ProjectResponse getProjectById(Long id, Long userId) {
-        Project project = projectRepository.findAccessibleProjectsById(id , userId).orElseThrow();
+        Project project = projectRepository
+                .findAccessibleProjectsById(id , userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Project " , id)
+        );
 //        return modelMapper.map(project , ProjectResponse.class);
         return projectMapper.toProjectResponse(project);
     }
 
     @Override
     public ProjectResponse createProject(ProjectRequest request, Long userId) {
-        User owner = userRepository.findById(userId).orElseThrow();
+        User owner = userRepository.findById(userId).orElseThrow(
+                () -> new ResourceNotFoundException("Project" , userId)
+        );
         Project project = Project.builder()
                 .name(request.name())
                 .owner(owner)
@@ -59,7 +65,9 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public ProjectResponse updateProject(Long id, ProjectRequest request,Long userId) {
 
-        Project project = projectRepository.findAccessibleProjectsById(id , userId).orElseThrow();
+        Project project = projectRepository.findAccessibleProjectsById(id , userId).orElseThrow(
+                () -> new ResourceNotFoundException("Project" , userId)
+        );
         if(!project.getOwner().getId().equals(userId)){
             throw new RuntimeException("U are not allowed to update");
         }
@@ -70,7 +78,9 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public void softDelete(Long id, Long userId) {
-        Project project = projectRepository.findAccessibleProjectsById(id , userId).orElseThrow();
+        Project project = projectRepository.findAccessibleProjectsById(id , userId).orElseThrow(
+                () -> new ResourceNotFoundException("Project" , userId)
+        );
         if(!project.getOwner().getId().equals(userId)){
             throw new RuntimeException("U are not allowed to delete");
         }
