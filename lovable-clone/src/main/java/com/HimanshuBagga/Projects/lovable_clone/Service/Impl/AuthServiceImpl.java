@@ -28,21 +28,35 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthUtil authUtil; // this will be injected since i have used @Component annotation there
     private final AuthenticationManager authenticationManager;
+//    @Override
+//    public AuthResponse signup(SignUpRequest request){
+//        // signup flow -> if User exists throw exception-> if not create sign up
+//        userRepository.findByUsername(request.username()).ifPresent(
+//                user -> {
+//                    throw new BadRequestException("User already exists with username: " + request.username());
+//                });
+//        User user = userMapper.toEntity(request);// signUpRequest Convert into User entity
+//        user.setPassword(passwordEncoder.encode(request.password())); // the password now will be stored in the form of #$@!%^@##$#@% not a string
+//        user = userRepository.save(user); // save the user
+//
+//        String token = authUtil.generateAccessToken(user); // generate a token
+//
+//        return new AuthResponse(token , userMapper.toUserProfileResponse(user));
+//    }
     @Override
     public AuthResponse signup(SignUpRequest request){
-        // signup flow -> if User exists throw exception-> if not create sign up
-        userRepository.findByUsername(request.username()).ifPresent(
-                user -> {
-                    throw new BadRequestException("User already exists with username: " + request.username());
-                });
-        User user = userMapper.toEntity(request);// signUpRequest Convert into User entity
-        user.setPassword(passwordEncoder.encode(request.password())); // the password now will be stored in the form of #$@!%^@##$#@% not a string
-        user = userRepository.save(user); // save the user
+    userRepository.findByUsername(request.username()).ifPresent(
+            user -> { throw new BadRequestException("User already exists with username: " + request.username()); }
+    );
 
-        String token = authUtil.generateAccessToken(user); // generate a token
+    User user = userMapper.toEntity(request);
+    user.setPassword(passwordEncoder.encode(request.password()));
+    user = userRepository.save(user);
 
-        return new AuthResponse(token , userMapper.toUserProfileResponse(user));
-    }
+    String token = authUtil.generateAccessToken(user);
+
+    return new AuthResponse(token, userMapper.toUserProfileResponse(user));
+}
     @Override
     public AuthResponse login(LoginRequest request){
         Authentication authentication = authenticationManager.authenticate(

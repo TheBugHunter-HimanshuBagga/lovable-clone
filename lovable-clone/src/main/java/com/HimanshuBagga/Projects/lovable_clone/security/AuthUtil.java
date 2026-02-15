@@ -12,24 +12,23 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Date;
 
-@Component // spring create an object for this class and manager this for me
+@Component
 public class AuthUtil {
 
-    @Value("jwt.secret-key")
+    @Value("${jwt.secret-key}")
     private String jwtSecretKey;
 
-    private SecretKey getSecretKey(){ //used to convert simple string into secret key object
+    private SecretKey getSecretKey() {
         return Keys.hmacShaKeyFor(jwtSecretKey.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String generateAccessToken(User user){
+    public String generateAccessToken(User user) {
         return Jwts.builder()
                 .subject(user.getUsername())
-                .claim("userId", user.getId().toString())
+                .claim("userId", user.getId())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 10))
                 .signWith(getSecretKey())
                 .compact();
     }
-
 }

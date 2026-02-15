@@ -14,6 +14,8 @@ etc.}
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.PasswordManagementDsl;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -35,8 +37,15 @@ public class WebSecurityConfig {
         return httpSecurity.build();
     }
 
-    @Bean
+    @Bean// used to encrypt the password before saving it into the database
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
+
+    @Bean// handels login authentications globally for jwt and login purposes
+    // Login request -> authentication Manager -> loadUserByUserName -> User from DB -> PasswordEncoder checks Password -> Login Success
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration){
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+
 }
