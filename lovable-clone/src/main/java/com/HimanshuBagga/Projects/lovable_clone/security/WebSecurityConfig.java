@@ -32,7 +32,8 @@ public class WebSecurityConfig {
                 .csrf(csrfConfig -> csrfConfig.disable())
                 .sessionManagement(sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/**").permitAll() // allow every one to access url starting with /api/** without login with auth without token
+                        .requestMatchers("/api/auth/**").permitAll() // allow every one to access url starting with /api/** without login with auth without token
+                        .anyRequest().authenticated()
                 );
         return httpSecurity.build();
     }
@@ -47,5 +48,7 @@ public class WebSecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration){
         return authenticationConfiguration.getAuthenticationManager();
     }
+
+
 
 }

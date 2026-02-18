@@ -1,6 +1,7 @@
 package com.HimanshuBagga.Projects.lovable_clone.security;
 
 import com.HimanshuBagga.Projects.lovable_clone.Entity.User;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.validation.Valid;
@@ -30,5 +31,16 @@ public class AuthUtil {
                 .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 10))
                 .signWith(getSecretKey())
                 .compact();
+    }
+
+    public JwtUserPrinciple verifyAccessToken(String token){
+        Claims claims = Jwts.parser()
+                .verifyWith(getSecretKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+        Long userId = Long.parseLong(claims.get("userId" , String.class));
+        String username = claims.getSubject();
+        return new JwtUserPrinciple(userId , username);
     }
 }
