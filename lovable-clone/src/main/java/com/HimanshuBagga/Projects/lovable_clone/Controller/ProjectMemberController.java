@@ -5,6 +5,7 @@ import com.HimanshuBagga.Projects.lovable_clone.DTO.members.MemberResponse;
 import com.HimanshuBagga.Projects.lovable_clone.DTO.members.updateMemberRole;
 import com.HimanshuBagga.Projects.lovable_clone.Entity.ProjectMember;
 import com.HimanshuBagga.Projects.lovable_clone.Service.ProjectMemberService;
+import com.HimanshuBagga.Projects.lovable_clone.security.AuthUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,31 +19,27 @@ import java.util.List;
 @RequestMapping("/api/project/{projectId}/members")
 public class ProjectMemberController {
     private final ProjectMemberService projectMemberService;
-
+    private final AuthUtil authUtil;
     @GetMapping
     public ResponseEntity<List<MemberResponse>> getProjectMembers(@PathVariable Long projectId){
-        Long userId = 1L;
-        return ResponseEntity.ok(projectMemberService.getProjectMembers(projectId , userId));
+        return ResponseEntity.ok(projectMemberService.getProjectMembers(projectId));
     }
 
     @PostMapping
     public ResponseEntity<MemberResponse> inviteMember(@PathVariable Long projectId , @RequestBody @Valid InviteMemberRequest request){
-        Long userId = 1L;
         return ResponseEntity.status(HttpStatus.CREATED).body(
-            projectMemberService.inviteMember(projectId , userId , request)
+            projectMemberService.inviteMember(projectId , request)
         );
     }
 
     @PatchMapping("/{memberId}")
     public ResponseEntity<MemberResponse> updateMember(@PathVariable Long projectId , @PathVariable Long memberId, @RequestBody @Valid updateMemberRole request){
-        Long userId = 1L;
-        return ResponseEntity.ok(projectMemberService.updateMemberRole(projectId,userId,memberId , request));
+        return ResponseEntity.ok(projectMemberService.updateMemberRole(projectId,memberId , request));
     }
 
     @DeleteMapping("/{memberId}")
     public ResponseEntity<Void> deleteMember(@PathVariable Long projectId , @PathVariable Long memberId){
-        Long userId = 1L;
-        projectMemberService.deleteMember(projectId,userId,memberId);
+        projectMemberService.deleteMember(projectId,memberId);
         return ResponseEntity.noContent().build();
     }
 }

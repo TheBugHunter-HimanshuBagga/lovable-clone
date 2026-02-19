@@ -13,6 +13,7 @@ import com.HimanshuBagga.Projects.lovable_clone.mapper.ProjectMemberMapper;
 import com.HimanshuBagga.Projects.lovable_clone.repository.ProjectMemberRepository;
 import com.HimanshuBagga.Projects.lovable_clone.repository.ProjectRepository;
 import com.HimanshuBagga.Projects.lovable_clone.repository.UserRepository;
+import com.HimanshuBagga.Projects.lovable_clone.security.AuthUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -30,9 +31,10 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     ProjectRepository projectRepository;
     ProjectMemberMapper projectMemberMapper;
     UserRepository userRepository;
+    AuthUtil authUtil;
     @Override
-    public List<MemberResponse> getProjectMembers(Long projectId, Long userId) {
-
+    public List<MemberResponse> getProjectMembers(Long projectId) {
+        Long userId = authUtil.getCurrentUserId();
         Project project = projectRepository.findAccessibleProjectsById(projectId , userId).orElseThrow(
                 () -> new ResourceNotFoundException("Project not found with id : " , projectId)
         ); // i got the project
@@ -44,7 +46,9 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     }
 
     @Override
-    public MemberResponse inviteMember(Long projectId, Long userId, InviteMemberRequest request) {
+    public MemberResponse inviteMember(Long projectId, InviteMemberRequest request) {
+        Long userId = authUtil.getCurrentUserId();
+
         Project project = projectRepository.findAccessibleProjectsById(projectId , userId).orElseThrow(
                 () -> new ResourceNotFoundException("Project not found with id : " , projectId)
         );
@@ -77,7 +81,9 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     }
 
     @Override
-    public MemberResponse updateMemberRole(Long projectId, Long userId, Long memberId, updateMemberRole request) {
+    public MemberResponse updateMemberRole(Long projectId, Long memberId, updateMemberRole request) {
+        Long userId = authUtil.getCurrentUserId();
+
         Project project = projectRepository.findAccessibleProjectsById(projectId,userId).orElseThrow();
 //        if(!project.getOwner().getId().equals(userId)){
 //            throw new RuntimeException("Not Allowed");
@@ -90,7 +96,9 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     }
 
     @Override
-    public void deleteMember(Long projectId, Long userId, Long memberId) {
+    public void deleteMember(Long projectId,Long memberId) {
+        Long userId = authUtil.getCurrentUserId();
+
         Project project = projectRepository.findAccessibleProjectsById(projectId , userId).orElseThrow();
 //        if(!project.getOwner().getId().equals(userId)){
 //            throw new RuntimeException("Not Allowed");
